@@ -1,2 +1,2 @@
 cargo build
-./target/debug/d02_0 ./input.txt
+./target/debug/d01_0 ./input.txt

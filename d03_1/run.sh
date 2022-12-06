@@ -1,2 +1,2 @@
 cargo build
-cargo run input.txt
+./target/debug/d02_1 ./input.txt

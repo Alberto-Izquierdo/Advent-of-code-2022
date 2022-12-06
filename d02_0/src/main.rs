@@ -1,66 +1,55 @@
-use std::collections::HashSet;
 use std::env;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
 fn main() {
-    // File hosts must exist in current path before this produces output
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         panic!("An input file is required");
     }
     let file = args.iter().nth(1).unwrap();
     let lines = read_lines(file).unwrap();
-    // Consumes the iterator, returns an (Optional) String
-    let result: u32 = lines
+    let total_score: u32 = lines
         .map(|line| {
             let line = line.unwrap();
-            process_line(&line)
+            let mut chars = line.chars();
+            let first_transformed = std::char::from_u32(chars.next().unwrap() as u32 + 23).unwrap();
+            let last = chars.last().unwrap();
+            get_score(first_transformed, last)
         })
         .sum();
-    println!("Result: {}", result);
+    println!("Score: {}", total_score);
 }
 
-fn process_line(line: &str) -> u32 {
-    let (first, second) = line.split_at(line.len() / 2);
-    let set = first.chars().collect::<HashSet<char>>();
-    let common_value = second
-        .chars()
-        .find(|value| set.get(value).is_some())
-        .unwrap();
-    get_character_value(common_value)
+fn get_score(first: char, second: char) -> u32 {
+    get_sign_score(second) + compare_signs(first, second)
 }
 
-fn get_character_value(character: char) -> u32 {
-    if character >= 'A' && character <= 'Z' {
-        character as u32 - 38
+fn get_sign_score(value: char) -> u32 {
+    match value {
+        'X' => 1,
+        'Y' => 2,
+        'Z' => 3,
+        _ => panic!(),
+    }
+}
+
+fn compare_signs(first: char, second: char) -> u32 {
+    if first == second {
+        3
     } else {
-        character as u32 - 96
+        if first == 'X' && second == 'Y' {
+            6
+        } else if first == 'Y' && second == 'Z' {
+            6
+        } else if first == 'Z' && second == 'X' {
+            6
+        } else {
+            0
+        }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
-    #[test]
-    fn test_p() {
-        assert_eq!(get_character_value('p'), 16);
-    }
-
-    #[test]
-    fn test_upper_l() {
-        assert_eq!(get_character_value('L'), 38);
-    }
-
-    #[test]
-    fn test_upper_p() {
-        assert_eq!(get_character_value('P'), 42);
-    }
-}
-
-// IO
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
