@@ -5,7 +5,7 @@ use std::path::Path;
 
 fn main() {
     let file_name = get_nth_parameter(1);
-    let _lines = read_lines(&file_name);
+    let _lines = read_lines(&file_name).unwrap();
     println!("Hello, world!");
 }
 
