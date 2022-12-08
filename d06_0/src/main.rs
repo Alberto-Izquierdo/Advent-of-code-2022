@@ -9,23 +9,24 @@ fn main() {
     let stream = read_lines(&file_name).unwrap().next().unwrap().unwrap();
     let mut list: LinkedList<char> = LinkedList::new();
     let mut stream_iterator = stream.chars();
+    let list_size = 4;
     stream_iterator
         .by_ref()
-        .take(4)
+        .take(list_size)
         .for_each(|character| list.push_back(character));
     let position = stream_iterator
         .take_while(|character| {
-            let hash = list
+            let set = list
                 .iter()
                 .map(|character| *character)
                 .collect::<HashSet<char>>();
-            let found = list.len() == hash.len();
+            let found = list.len() == set.len();
             list.pop_front();
             list.push_back(*character);
             !found
         })
         .count()
-        + 4;
+        + list_size;
     println!("Result: {}", position);
 }
 
