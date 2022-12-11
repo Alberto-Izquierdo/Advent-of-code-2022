@@ -16,69 +16,53 @@ fn main() {
                 .collect::<Vec<u32>>()
         })
         .collect::<Vec<Vec<u32>>>();
-    let mut visible_trees = 0;
-    for y in 1..forest.len() - 1 {
-        for x in 1..forest[0].len() - 1 {
-            if is_tree_visible(&forest, x as usize, y as usize) {
-                visible_trees += 1;
+    let mut highest_scenic_score = 0;
+    for y in 0..forest.len() {
+        for x in 0..forest[0].len() {
+            let current_scenic_score = get_scenic_score(&forest, x as usize, y as usize);
+            if current_scenic_score > highest_scenic_score {
+                highest_scenic_score = current_scenic_score;
             }
         }
     }
-    // Add edges
-    visible_trees += forest.len() * 2;
-    visible_trees += forest[0].len() * 2;
-    // Remove duplicated corners
-    visible_trees -= 4;
-    println!("Result: {}", visible_trees);
+    println!("Result: {}", highest_scenic_score);
 }
 
-fn is_tree_visible(forest: &Vec<Vec<u32>>, x: usize, y: usize) -> bool {
+fn get_scenic_score(forest: &Vec<Vec<u32>>, x: usize, y: usize) -> usize {
     let current_height = &forest[y][x];
     // left
-    let mut left_visible = true;
-    for left in 0..x {
+    let mut left_seen_trees = 0;
+    for left in (0..x).rev() {
+        left_seen_trees += 1;
         if &forest[y][left] >= current_height {
-            left_visible = false;
             break;
         }
-    }
-    if left_visible {
-        return true;
     }
     // right
-    let mut right_visible = true;
+    let mut right_seen_trees = 0;
     for right in (x + 1)..forest[y].len() {
+        right_seen_trees += 1;
         if &forest[y][right] >= current_height {
-            right_visible = false;
             break;
         }
-    }
-    if right_visible {
-        return true;
     }
     // top
-    let mut top_visible = true;
-    for top in 0..y {
+    let mut top_seen_trees = 0;
+    for top in (0..y).rev() {
+        top_seen_trees += 1;
         if &forest[top][x] >= current_height {
-            top_visible = false;
             break;
         }
-    }
-    if top_visible {
-        return true;
     }
     // bottom
-    let mut bottom_visible = true;
+    let mut bottom_seen_trees = 0;
     for bottom in (y + 1)..forest.len() {
+        bottom_seen_trees += 1;
         if &forest[bottom][x] >= current_height {
-            bottom_visible = false;
             break;
         }
     }
-    if bottom_visible {
-        return true;
-    }
-    false
+    left_seen_trees * right_seen_trees * top_seen_trees * bottom_seen_trees
 }
 
 fn get_nth_parameter(index: usize) -> String {
